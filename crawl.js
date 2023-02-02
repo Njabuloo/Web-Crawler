@@ -1,5 +1,24 @@
 const { JSDOM } = require('jsdom');
 
+async function crawlerPage(baseURL) {
+	try {
+		const response = await fetch(baseURL);
+		if (response.status >= 400) {
+			console.log(`An error occurred, status code: ${response.status}`);
+			return;
+		}
+
+		if (!response.headers.get('content-type').includes('text/html')) {
+			console.log('An error occured');
+			return;
+		}
+		const data = await response.text();
+		console.log(await data);
+	} catch (error) {
+		console.log(error.message);
+	}
+}
+
 function getURLsFromHTML(htmlBody, baseURL) {
 	const dom = new JSDOM(htmlBody, { url: 'http://localhost/' });
 	const tags = dom.window.document.querySelectorAll('a');
@@ -8,11 +27,9 @@ function getURLsFromHTML(htmlBody, baseURL) {
 		if (href.includes(baseURL)) {
 			return baseURL.length === href.length ? `${href}/` : href;
 		}
-
 		if (href[0] !== '/') {
 			return;
 		}
-
 		return `${baseURL}${href}`;
 	});
 }
@@ -37,4 +54,5 @@ function extractHrefs(nodeListTTags) {
 module.exports = {
 	normalizeURL,
 	getURLsFromHTML,
+	crawlerPage,
 };
