@@ -23,37 +23,41 @@ describe('crawl module', () => {
 
 describe('get urls from HTLM method', () => {
 	test('absolute', () => {
-		const baseURL = 'http://wagslane.dev';
-		const htmlBody =
+		const inputBaseURL = 'http://wagslane.dev';
+		const inputHTMLBody =
 			'<html><body><a href="http://wagslane.dev"><span>Boot.dev></span></a></body></html>';
 		const expectedTags = ['http://wagslane.dev/'];
-		expect(getURLsFromHTML(baseURL, htmlBody)).toEqual(expectedTags);
+		const actualTags = getURLsFromHTML(inputHTMLBody, inputBaseURL);
+		expect(actualTags).toEqual(expectedTags);
 	});
 
 	test('relative', () => {
-		const baseURL = 'http://wagslane.dev';
-		const htmlBody =
+		const inputBaseURL = 'http://wagslane.dev';
+		const inputHTMLBody =
 			'<html><body><a href="/path"><span>Boot.dev></span></a></body></html>';
 		const expectedTags = ['http://wagslane.dev/path'];
-		expect(getURLsFromHTML(baseURL, htmlBody)).toEqual(expectedTags);
+		const actualTags = getURLsFromHTML(inputHTMLBody, inputBaseURL);
+		expect(actualTags).toEqual(expectedTags);
 	});
 
 	test('both', () => {
-		const baseURL = 'http://wagslane.dev';
-		const htmlBody =
+		const inputBaseURL = 'http://wagslane.dev';
+		const inputHTMLBody =
 			'<html><body><a href="/path"><span>Boot.dev></span></a><a href="http://wagslane.dev/path"><span>Boot.dev></span></a></body></html>';
 		const expectedTags = [
 			'http://wagslane.dev/path',
 			'http://wagslane.dev/path',
 		];
-		expect(getURLsFromHTML(baseURL, htmlBody)).toEqual(expectedTags);
+		const actualTags = getURLsFromHTML(inputHTMLBody, inputBaseURL);
+		expect(actualTags).toEqual(expectedTags);
 	});
 
 	test('error handling', () => {
-		const baseURL = 'http://wagslane.dev';
-		const htmlBody =
-			'<html><body><a href="/path"><span>Boot.dev></span></a><a href="http://wagslane.dev"><span>Boot.dev></span></a></body></html>';
+		const inputBaseURL = 'http://wagslane.dev';
+		const inputHTMLBody =
+			'<html><body><a href="path/a"><span>Boot.dev></span></a></body></html>';
 		const expectedTags = [];
-		expect(getURLsFromHTML(baseURL, htmlBody)).toEqual(expectedTags);
+		const actualTags = getURLsFromHTML(inputHTMLBody, inputBaseURL);
+		expect(actualTags).toEqual(expectedTags);
 	});
 });
