@@ -1,3 +1,10 @@
+const { JSDOM } = require('jsdom');
+
+const getURLsFromHTML = (htmlBody, baseURL) => {
+	const dom = new JSDOM(htmlBody);
+	return [];
+};
+
 const normalizeURL = (url) => {
 	if (url[url.length - 1] === '/') {
 		url = url.slice(0, -1);
@@ -9,4 +16,5 @@ const normalizeURL = (url) => {
 
 module.exports = {
 	normalizeURL,
+	getURLsFromHTML,
 };
