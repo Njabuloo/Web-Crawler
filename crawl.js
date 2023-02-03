@@ -1,28 +1,55 @@
 const { JSDOM } = require('jsdom');
 
-async function crawlerPage(baseURL) {
+async function crawlerPage(baseURL, currentURL, pages) {
+	if (!isSameDomain(baseURL, currentURL)) {
+		return pages;
+	}
+
+	const normalizedCurrentURL = normalizeURL(currentURL);
+
+	if (pages?.normalizedCurrentURL !== undefined) {
+		return { ...pages, normalizedCurrentURL: pages.normalizedCurrentURL + 1 };
+	}
+
+	console.log(`crawling ${normalizedCurrentURL}`);
+	let data = '';
 	try {
-		const response = await fetch(baseURL);
+		const response = await fetch(`https://${normalizedCurrentURL}`);
+
 		if (response.status >= 400) {
 			console.log(`An error occurred, status code: ${response.status}`);
-			return;
+			return pages;
 		}
 
 		if (!response.headers.get('content-type').includes('text/html')) {
 			console.log('An error occured');
-			return;
+			return pages;
 		}
-		const data = await response.text();
-		console.log(await data);
+
+		data = await response.text();
 	} catch (error) {
 		console.log(error.message);
+	}
+
+	const URLs = getURLsFromHTML(data, baseURL);
+	pages = URLs.forEach((url) => crawlerPage(baseURL, url, pages));
+	return pages;
+}
+
+function isSameDomain(baseURL, currentURL) {
+	try {
+		const baseURLObj = new URL(baseURL);
+		const currentURLObj = new URL(currentURL);
+		return baseURLObj.hostname === currentURLObj.hostname;
+	} catch (error) {
+		return false;
 	}
 }
 
 function getURLsFromHTML(htmlBody, baseURL) {
 	const dom = new JSDOM(htmlBody, { url: 'http://localhost/' });
-	const tags = dom.window.document.querySelectorAll('a');
-	const hrefs = extractHrefs(tags);
+	const aTags = dom.window.document.querySelectorAll('a');
+	const hrefs = extractHrefs(aTags);
 	return hrefs.map((href) => {
 		if (href.includes(baseURL)) {
 			return baseURL.length === href.length ? `${href}/` : href;

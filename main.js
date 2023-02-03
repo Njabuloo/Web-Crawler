@@ -8,7 +8,7 @@ const main = () => {
 
 	const baseURL = process.argv[2];
 	console.log(`The crawler is starting at ${baseURL}`);
-	crawlerPage(baseURL);
+	crawlerPage(baseURL, baseURL, {});
 };
 
 main();
